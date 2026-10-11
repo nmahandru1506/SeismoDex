@@ -29,7 +29,7 @@ if "region" not in st.session_state:
 
 st.write("**Choose a region below:**")
 
-col5, col6, col7, col8 = st.columns([1, 1, 1.5, 1.5])
+col5, col6, col7, col8 = st.columns([1, 1, 1.5, 1.5],gap=None)
 with col5:
     if st.button("Asia"):
         st.session_state["region"] = "Asia"
@@ -233,4 +233,4 @@ with st.expander("View earthquake data"):
 
 st.caption("All data displayed was taken from the USGS earthquake feed (Last updated 2026)")
 
-st.write("Fortnite")
+# ADD COMMENTS!!
