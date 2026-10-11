@@ -233,8 +233,6 @@ with st.expander("View earthquake data"):
 
 st.caption("All data displayed was taken from the USGS earthquake feed (Last updated 2026)")
 
-st.write("Fortnite balls.")
-
 
 
 
