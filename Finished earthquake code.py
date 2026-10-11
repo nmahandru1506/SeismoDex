@@ -99,6 +99,7 @@ def get_region(region, min_magnitude, max_depth):
 
 min_magnitude = st.slider("Minimum Magnitude", min_value=2.5, max_value=8.0, value=4.0, step=0.1)
 max_depth = st.slider("Maximum Depth", min_value=0, max_value=656, value=323, step=1)
+# add info on depth and magnitude
 
 region_data, centre_lat, centre_lon, zoom = get_region(region, min_magnitude, max_depth)
 
@@ -174,7 +175,7 @@ if not region_data.empty:
     deep_index = region_data["depth"].idxmax()
     deep_loc = region_data.loc[deep_index, "place"]
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-
+    # REMEMBER TO MENTION WHICH ZONE IT IS
     with col1:
         st.metric("Earthquakes", num_earthquakes)
 
@@ -206,6 +207,8 @@ if not region_data.empty:
         ax.set_xlabel("Magnitude of earthquakes")
         ax.set_ylabel("Number of earthquakes")
         ax.set_title(f"Earthquake Magnitude Distribution - {region}")
+        ax.set_facecolor("#0d1118")
+        
         plt.tight_layout()
         st.pyplot(fig)
 
