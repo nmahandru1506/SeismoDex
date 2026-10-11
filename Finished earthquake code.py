@@ -29,30 +29,13 @@ if "region" not in st.session_state:
 
 st.write("**Choose a region below:**")
 
-with st.container(horizontal=True, gap="0"):
-    if st.button("Asia"):
-        st.session_state["region"] = "Asia"
-
-    if st.button("Africa"):
-        st.session_state["region"] = "Africa"
-
-    if st.button("Europe"):
-        st.session_state["region"] = "Europe"
-
-    if st.button("Oceania"):
-        st.session_state["region"] = "Oceania"
-
-    if st.button("North America"):
-        st.session_state["region"] = "North America"
-
-    if st.button("Antarctica"):
-        st.session_state["region"] = "Antarctica"
-
-    if st.button("South America"):
-        st.session_state["region"] = "South America"
-
-    if st.button("World"):
-        st.session_state["region"] = "World"
+st.session_state["region"] = st.pills(
+    "Select a region",
+    options=regions,
+    selection_mode="single",
+    default=st.session_state["region"],
+    label_visibility="collapsed",
+)
 
 # col5, col6, col7, col8 = st.columns([1, 1, 1.5, 1.5])
 # with col5:
