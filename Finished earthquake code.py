@@ -31,24 +31,24 @@ st.write("**Choose a region below:**")
 
 col5, col6, col7, col8 = st.columns([1, 1, 1.5, 1.5],gap=None)
 with col5:
-    if st.button("Asia"):
+    if st.button("Asia", use_container_width=True):
         st.session_state["region"] = "Asia"
-    if st.button("Africa"):
+    if st.button("Africa", use_container_width=True):
         st.session_state["region"] = "Africa"
 with col6:
-    if st.button("Europe"):
+    if st.button("Europe", use_container_width=True):
         st.session_state["region"] = "Europe"
-    if st.button("Oceania"):
+    if st.button("Oceania", use_container_width=True):
         st.session_state["region"] = "Oceania"
 with col7:
-    if st.button("North America"):
+    if st.button("North America", use_container_width=True):
         st.session_state["region"] = "North America"
-    if st.button("Antarctica"):
+    if st.button("Antarctica", use_container_width=True):
         st.session_state["region"] = "Antarctica"
 with col8:
-    if st.button("South America"):
+    if st.button("South America", use_container_width=True):
         st.session_state["region"] = "South America"
-    if st.button("World"):
+    if st.button("World", use_container_width=True):
         st.session_state["region"] = "World"
 
 region = st.session_state["region"]
