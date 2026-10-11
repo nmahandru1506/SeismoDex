@@ -22,7 +22,7 @@ regions = {"Asia": {"min_lat": -10, "max_lat": 90, "min_lon": 25, "max_lon": 180
            "South America": {"min_lat": -55, "max_lat": 12, "min_lon": -82, "max_lon": -35},
            "Africa": {"min_lat": -34, "max_lat": 39, "min_lon": -17, "max_lon": 50},
            "Antarctica": {"min_lat": -90, "max_lat": -60, "min_lon": -180, "max_lon": 180},
-           "Oceania": {"min_lat": -50, "max_lat": 10, "min_lon": 110, "max_lon": 180}
+           "Oceania": {"min_lat": -50, "max_lat": 10, "min_lon": 110, "max_lon": 180},
            "World": {"min_lat": -180, "max_lat": 180, "min_lon": -180, "max_lon": 180}}
 
 if "region" not in st.session_state:
