@@ -201,14 +201,30 @@ if not region_data.empty:
         magnitude_counts = region_data["magnitude_category"].value_counts().sort_index()
         fig, ax = plt.subplots()
         x = np.arange(4)
-        ax.bar(x, magnitude_counts)
-        ax.set_xticks(x)
-        ax.set_xticklabels(magnitude_counts.index)
-        ax.set_xlabel("Magnitude of earthquakes")
-        ax.set_ylabel("Number of earthquakes")
-        ax.set_title(f"Earthquake Magnitude Distribution - {region}")
-        ax.set_facecolor("#0d1118")
         
+        theme = st.get_option("theme.base")
+
+        if theme == "dark":
+            bg_color = "#0d1118"
+            plot_color = "#0d1118"
+            text_color = "white"
+            bar_color = "#00C2A8"
+        else:
+            bg_color = "#FFFFFF"
+            plot_color = "#F5F5F5"
+            text_color = "#222222"
+            bar_color = "#0077B6"
+        
+        fig.patch.set_facecolor(bg_color)
+        ax.set_facecolor(plot_color)
+        ax.bar(x, magnitude_counts.values, color=bar_color)
+        ax.set_xticks(x)
+        ax.set_xticklabels(magnitude_counts.index, color=text_color)
+        ax.set_xlabel("Magnitude of earthquakes", color=text_color)
+        ax.set_ylabel("Number of earthquakes", color=text_color)
+        ax.set_title(
+            f"Earthquake Magnitude Distribution - {region}", color=text_color
+        )
         plt.tight_layout()
         st.pyplot(fig)
 
