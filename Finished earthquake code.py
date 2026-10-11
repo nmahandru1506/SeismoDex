@@ -29,35 +29,35 @@ if "region" not in st.session_state:
 
 st.write("**Choose a region below:**")
 
-# st.session_state["region"] = st.pills(
-#     "Select a region",
-#     options=regions,
-#     selection_mode="single",
-#     default=st.session_state["region"],
-#     label_visibility="collapsed",
-# )
+st.session_state["region"] = st.pills(
+    "Select a region",
+    options=regions,
+    selection_mode="single",
+    default=st.session_state["region"],
+    label_visibility="collapsed",
+)
 
-col5, col6, col7, col8 = st.columns([1, 1, 1.5, 1.5])
-with col5:
-    if st.button("Asia"):
-        st.session_state["region"] = "Asia"
-    if st.button("Africa"):
-        st.session_state["region"] = "Africa"
-with col6:
-    if st.button("Europe"):
-        st.session_state["region"] = "Europe"
-    if st.button("Oceania"):
-        st.session_state["region"] = "Oceania"
-with col7:
-    if st.button("North America"):
-        st.session_state["region"] = "North America"
-    if st.button("Antarctica"):
-        st.session_state["region"] = "Antarctica"
-with col8:
-    if st.button("South America"):
-        st.session_state["region"] = "South America"
-    if st.button("World"):
-        st.session_state["region"] = "World"
+# col5, col6, col7, col8 = st.columns([1, 1, 1.5, 1.5])
+# with col5:
+#     if st.button("Asia"):
+#         st.session_state["region"] = "Asia"
+#     if st.button("Africa"):
+#         st.session_state["region"] = "Africa"
+# with col6:
+#     if st.button("Europe"):
+#         st.session_state["region"] = "Europe"
+#     if st.button("Oceania"):
+#         st.session_state["region"] = "Oceania"
+# with col7:
+#     if st.button("North America"):
+#         st.session_state["region"] = "North America"
+#     if st.button("Antarctica"):
+#         st.session_state["region"] = "Antarctica"
+# with col8:
+#     if st.button("South America"):
+#         st.session_state["region"] = "South America"
+#     if st.button("World"):
+#         st.session_state["region"] = "World"
 
 region = st.session_state["region"]
 
