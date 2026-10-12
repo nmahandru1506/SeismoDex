@@ -1,10 +1,10 @@
+# import libraries for data processing, geographic mapping and visualisation
 import pandas as pd
 import geopandas as gpd
 import streamlit as st
 import pydeck as pdk
-import matplotlib.pyplot as plt
-import numpy as np
 import plotly.express as px
+import json
 st.set_page_config(layout="wide")
 
 
@@ -32,7 +32,7 @@ if "region" not in st.session_state:
     st.session_state["region"] = "Asia"
 
 st.write("**Choose a region below:**")
-
+# allow users to select a continent or view earthquake activity worldwide
 st.session_state["region"] = st.pills(
     "Select a region",
     options=regions,
@@ -40,31 +40,11 @@ st.session_state["region"] = st.pills(
     default=st.session_state["region"],
     label_visibility="collapsed",
 )
-# creating buttons for the user to interact with to change the map data
-
-# col5, col6, col7, col8 = st.columns([1, 1, 1.5, 1.5])
-# with col5:
-#     if st.button("Asia"):
-#         st.session_state["region"] = "Asia"
-#     if st.button("Africa"):
-#         st.session_state["region"] = "Africa"
-# with col6:
-#     if st.button("Europe"):
-#         st.session_state["region"] = "Europe"
-#     if st.button("Oceania"):
-#         st.session_state["region"] = "Oceania"
-# with col7:
-#     if st.button("North America"):
-#         st.session_state["region"] = "North America"
-#     if st.button("Antarctica"):
-#         st.session_state["region"] = "Antarctica"
-# with col8:
-#     if st.button("South America"):
-#         st.session_state["region"] = "South America"
-#     if st.button("World"):
-#         st.session_state["region"] = "World"
 
 region = st.session_state["region"]
+
+# filter earthquakes by region, minimum magnitude and maximum depth
+# calculate the map centre and zoom level for the selected region
 
 
 def get_region(region, min_magnitude, max_depth):
@@ -100,7 +80,7 @@ def get_region(region, min_magnitude, max_depth):
                                   (earthquakes["depth"] <= max_depth)]
     return region_data, centre_lat, centre_lon, zoom
 
-# a function used to define zoom magnitudes and sort region data to isolate the region centre, magnitude and depth
+# let users adjust the minimum earthquake magnitude and maximum depth
 
 
 min_magnitude = st.slider("Minimum Magnitude", min_value=2.5, max_value=8.0, value=4.0, step=0.1)
@@ -117,35 +97,54 @@ legend_column, country_column = st.columns([65, 35])
 with legend_column:
     st.write("Magnitude: 🟢 2.5–4.0    🟡 4.0–5.5     🟠 5.5–6.5     🔴 6.5+")
     st. caption("Hover over earthquakes for more information")
+# allow users to select a country within the chosen continent
+# use the country's geographic boundaries to calculate the map centre and zoom level
 with country_column:
     if region != "World":
         country = world[world["CONTINENT"] == region]
         country_name = country["NAME"]
-        country_selected = st.selectbox("Select a country", country_name)
-        selected_country = country[country["NAME"] == country_selected]
-        geometry = selected_country.geometry.iloc[0]
-        if geometry.geom_type == "MultiPolygon":
-            largest_polygon = max(geometry.geoms, key=lambda x: x.area)
-            largest_polygon = geometry
-            min_lon, min_lat, max_lon, max_lat = largest_polygon.bounds
-            centre_lon = (min_lon + max_lon) / 2
-            centre_lat = (min_lat + max_lat) / 2
-            lat_span = max_lat - min_lat
-            lon_span = max_lon - min_lon
-            if lon_span > 180:
-                centre_lon = 180
-                lon_span = 360-lon_span
-            largest_span = max(lat_span, lon_span)
-            if largest_span > 60:
-                zoom = 2
-            elif largest_span > 30:
-                zoom = 3
-            elif largest_span > 15:
-                zoom = 4
-            elif largest_span > 5:
-                zoom = 5
-            else:
-                zoom = 6
+
+    country_selected = st.selectbox(
+        "Select a country",
+        country_name
+    )
+
+    selected_country = country[
+        country["NAME"] == country_selected
+    ]
+
+    geometry = selected_country.geometry.iloc[0]
+
+    # Use the largest polygon for countries with multiple landmasses
+    if geometry.geom_type == "MultiPolygon":
+        zoom_geometry = max(
+            geometry.geoms,
+            key=lambda polygon: polygon.area
+        )
+    else:
+        zoom_geometry = geometry
+
+    # Calculate the centre and size of the selected landmass
+    min_lon, min_lat, max_lon, max_lat = zoom_geometry.bounds
+
+    centre_lon = (min_lon + max_lon) / 2
+    centre_lat = (min_lat + max_lat) / 2
+
+    lat_span = max_lat - min_lat
+    lon_span = max_lon - min_lon
+    largest_span = max(lat_span, lon_span)
+
+    # Choose zoom level based on the size of the landmass
+    if largest_span > 60:
+        zoom = 2
+    elif largest_span > 30:
+        zoom = 3
+    elif largest_span > 15:
+        zoom = 4
+    elif largest_span > 5:
+        zoom = 5
+    else:
+        zoom = 6
 
 
 view_state = pdk.ViewState(
@@ -163,6 +162,27 @@ region_data["formatted_time"] = (
 )
 # time conversion for hover feature
 
+country_layer = None
+
+if region != "World":
+    country_geojson = json.loads(selected_country.to_json())
+
+# highlight the selected country using its geographic boundary
+
+country_layer = pdk.Layer(
+    "GeoJsonLayer",
+    data=country_geojson,
+    get_fill_color=[22, 180, 170, 70],
+    get_line_color=[0, 120, 130, 255],
+    get_line_width=2,
+    line_width_min_pixels=2,
+    filled=True,
+    stroked=True,
+    pickable=False
+)
+
+# combines the map layers, appearance and hover feature
+
 layer = pdk.Layer(
     "ScatterplotLayer",
     data=region_data,
@@ -171,9 +191,8 @@ layer = pdk.Layer(
     get_fill_color="mag<4 ? [((mag - 2.5) / 1.5) * 255, 255, 0, 255]: mag<5.5 ? [255, 255 - (((mag - 4.0) / 1.5) * 115), 0, 255]: [255, 140 - (((mag - 5.5) / 2.5) * 140), 0, 255]",
     pickable=True)
 
-
 map = pdk.Deck(
-    layers=layer,
+    layers=([country_layer, layer] if country_layer is not None else [layer]),
     initial_view_state=view_state,
     tooltip={
         "html": """
@@ -205,16 +224,14 @@ st.pydeck_chart(map, height=600)
 
 st.subheader(f"Earthquake Statistics - {region}")
 
-
+# calculate summary statistics for earthquakes matching the selected filters
 if not region_data.empty:
 
-    # Calculate earthquake statistics
     num_earthquakes = len(region_data)
     strong_earthquake = region_data["mag"].max()
     ave_mag = region_data["mag"].mean()
     deep_earthquake = region_data["depth"].max()
 
-    # Display statistics in four columns
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
@@ -232,25 +249,12 @@ if not region_data.empty:
     st.write("")
     st.subheader("Earthquake Analysis")
 
-    # Consistent styling for all three graphs
+    chart_template = "plotly_white"
+    background_colour = "#FFFFFF"
+    text_colour = "#263445"
+    grid_colour = "#E8EDF2"
+    chart_colour = "#168C9B"
 
-    # Detect the current Streamlit theme
-    theme = st.get_option("theme.base") or "light"
-
-    if theme == "dark":
-        chart_template = "plotly_dark"
-        background_colour = "#0E1621"
-        text_colour = "#E6EDF3"
-        grid_colour = "#293849"
-        chart_colour = "#35C6BE"
-    else:
-        chart_template = "plotly_white"
-        background_colour = "#FFFFFF"
-        text_colour = "#263445"
-        grid_colour = "#E8EDF2"
-        chart_colour = "#168C9B"
-
-    # Shared styling for all three charts
     chart_font = {
         "family": "Arial",
         "size": 13,
@@ -269,7 +273,7 @@ if not region_data.empty:
         }
     }
 
-    # GRAPH 1: Earthquake magnitude distribution
+    # GRAPH 1: earthquake magnitude distribution
 
     magnitude_category = pd.cut(
         region_data["mag"],
@@ -328,7 +332,7 @@ if not region_data.empty:
 
         st.plotly_chart(fig, use_container_width=True)
 
-    # GRAPH 2: Earthquake depth distribution
+    # GRAPH 2: earthquake depth distribution
 
     with graph_col2:
 
@@ -370,7 +374,7 @@ if not region_data.empty:
 
         st.plotly_chart(fig2, use_container_width=True)
 
-    # GRAPH 3: Earthquake frequency over time
+    # GRAPH 3: earthquake frequency over time
 
     region_data["time"] = pd.to_datetime(
         region_data["time"], utc=True
@@ -430,11 +434,21 @@ if not region_data.empty:
 else:
     st.write("**There are no earthquakes that match these conditions.**")
 st.subheader("Raw Data")
+# display the filtered earthquake data and allow users to export it as a CSV file
 with st.expander("View earthquake data"):
-    st.dataframe(
-        region_data[["place", "mag", "depth"]]
-        .sort_values("mag", ascending=False))
+    sorted_data = region_data[["place", "mag", "depth"]].sort_values(
+        "mag", ascending=False
+        )
+
+st.dataframe(sorted_data)
+st.write("**Click below to export data**")
+st.download_button(
+    label="Export data as CSV",
+    data=sorted_data.to_csv(index=False),
+    file_name="seismodex_earthquakes.csv",
+    mime="text/csv"
+)
+
 
 st.caption("All data displayed was taken from the USGS 2026 earthquake feed (Last updated 2026)")
 
-# ADD COMMENTS!!
