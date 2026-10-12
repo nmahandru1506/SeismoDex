@@ -4,6 +4,7 @@ import streamlit as st
 import pydeck as pdk
 import matplotlib.pyplot as plt
 import numpy as np
+import plotly.express as px
 st.set_page_config(layout="wide")
 
 
@@ -203,94 +204,214 @@ div[data-testid="stDeckGlJsonChart"] {
 st.pydeck_chart(map, height=600)
 
 st.subheader(f"Earthquake Statistics - {region}")
+
+
 if not region_data.empty:
+
+    # Calculate earthquake statistics
     num_earthquakes = len(region_data)
     strong_earthquake = region_data["mag"].max()
-    strong_index = region_data["mag"].idxmax()
-    strong_loc = region_data.loc[strong_index, "place"]
     ave_mag = region_data["mag"].mean()
     deep_earthquake = region_data["depth"].max()
-    deep_index = region_data["depth"].idxmax()
-    deep_loc = region_data.loc[deep_index, "place"]
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-    # REMEMBER TO MENTION WHICH ZONE IT IS
+
+    # Display statistics in four columns
+    col1, col2, col3, col4 = st.columns(4)
+
     with col1:
         st.metric("Earthquakes", num_earthquakes)
 
     with col2:
-        st.metric("Strongest", f"M{strong_earthquake}")
+        st.metric("Strongest", f"M{strong_earthquake:.1f}")
 
     with col3:
         st.metric("Average Magnitude", f"{ave_mag:.2f}")
 
     with col4:
         st.metric("Deepest", f"{deep_earthquake:.2f} km")
+
     st.write("")
-    st.subheader("**Earthquake Analysis**")
-    col1, col2 = st.columns([1, 1])
-    # graph 1
-    with col1:
-        magnitude_category = pd.cut(
-            region_data["mag"],
-            bins=[2.5, 4.0, 5.5, 6.5, 8.0],
-            labels=["2.5-4.0", "4.0-5.5", "5.5-6.5", "6.5+"])
+    st.subheader("Earthquake Analysis")
 
-        region_data["magnitude_category"] = magnitude_category
-        magnitude_counts = region_data["magnitude_category"].value_counts().sort_index()
-        fig, ax = plt.subplots()
-        x = np.arange(4)
+    # Consistent styling for all three graphs
+    chart_template = "plotly_white"
 
-        theme = st.get_option("theme.base")
+    chart_font = {
+        "family": "Arial",
+        "size": 13,
+        "color": "#263445"
+    }
 
-        if theme == "dark":
-            bg_color = "#0d1118"
-            plot_color = "#0d1118"
-            text_color = "white"
-            bar_color = "#00C2A8"
-        else:
-            bg_color = "#FFFFFF"
-            plot_color = "#F5F5F5"
-            text_color = "#222222"
-            bar_color = "#0077B6"
+    chart_layout = {
+        "template": chart_template,
+        "font": chart_font,
+        "paper_bgcolor": "#FFFFFF",
+        "plot_bgcolor": "#FFFFFF",
+        "margin": dict(l=15, r=15, t=65, b=20),
+        "height": 380
+    }
 
-        fig.patch.set_facecolor(bg_color)
-        ax.set_facecolor(plot_color)
-        ax.bar(x, magnitude_counts.values, color=bar_color)
-        ax.set_xticks(x)
-        ax.set_xticklabels(magnitude_counts.index, color=text_color)
-        ax.set_xlabel("Magnitude of earthquakes", color=text_color)
-        ax.set_ylabel("Number of earthquakes", color=text_color)
-        ax.set_title(
-            f"Earthquake Magnitude Distribution - {region}", color=text_color
+    chart_colour = "#168C9B"
+
+    # GRAPH 1: Earthquake magnitude distribution
+
+    magnitude_category = pd.cut(
+        region_data["mag"],
+        bins=[2.5, 4.0, 5.5, 6.5, 8.0],
+        labels=["2.5–4.0", "4.0–5.5", "5.5–6.5", "6.5+"],
+        include_lowest=True
+    )
+
+    magnitude_counts = (
+        magnitude_category.value_counts()
+        .reindex(
+            ["2.5–4.0", "4.0–5.5", "5.5–6.5", "6.5+"],
+            fill_value=0
         )
-        plt.tight_layout()
-        st.pyplot(fig)
+    )
 
-    # graph 2
+    # Put magnitude and depth graphs side by side
+    graph_col1, graph_col2 = st.columns(2)
 
-    region_data["time"] = pd.to_datetime(region_data["time"])
-    daily_counts = region_data["time"].dt.date.value_counts().sort_index()
-    fig1, ax = plt.subplots()
-    ax.plot(daily_counts.index, daily_counts)
-    ax.set_xlabel("Dates")
-    ax.set_ylabel("Number of earthquakes")
-    ax.set_title(f"Earthquake Frequency Over Time - {region}")
-    ax.tick_params(axis='x', labelrotation=45)
-    plt.tight_layout()
-    st.pyplot(fig1)
+    with graph_col1:
 
-    # graph 3
-    with col2:
-        fig2, ax = plt.subplots()
-        ax.hist(region_data["depth"], bins=20)
-        ax.set_xlabel("Depth (km)")
-        ax.set_ylabel("Number of earthquakes")
-        ax.set_title(f"Earthquake Frequency For Depth - {region}")
-        plt.tight_layout()
-        st.pyplot(fig2)
+        fig = px.bar(
+            x=magnitude_counts.index.astype(str),
+            y=magnitude_counts.values,
+            labels={
+                "x": "Magnitude",
+                "y": "Number of earthquakes"
+            },
+            title=f"Magnitude Distribution — {region}",
+            color_discrete_sequence=[chart_colour]
+        )
+
+        fig.update_layout(
+            **chart_layout,
+            showlegend=False,
+            title=dict(text=f"Magnitude Distribution — {region}", x=0.02)
+        )
+
+        fig.update_traces(
+            marker_line_width=0,
+            hovertemplate=(
+                "Magnitude: %{x}<br>"
+                "Earthquakes: %{y}"
+                "<extra></extra>"
+            )
+        )
+
+        fig.update_yaxes(
+            rangemode="tozero",
+            showgrid=True,
+            gridcolor="#E8EDF2",
+            zeroline=False
+        )
+
+        fig.update_xaxes(showgrid=False)
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    # GRAPH 2: Earthquake depth distribution
+
+    with graph_col2:
+
+        fig2 = px.histogram(
+            region_data,
+            x="depth",
+            nbins=20,
+            labels={
+                "depth": "Depth (km)",
+                "count": "Number of earthquakes"
+            },
+            title=f"Depth Distribution — {region}",
+            color_discrete_sequence=[chart_colour]
+        )
+
+        fig2.update_layout(
+            **chart_layout,
+            bargap=0.08,
+            title=dict(text=f"Depth Distribution — {region}", x=0.02)
+        )
+
+        fig2.update_traces(
+            marker_line_width=0,
+            hovertemplate=(
+                "Depth: %{x}<br>"
+                "Earthquakes: %{y}"
+                "<extra></extra>"
+            )
+        )
+
+        fig2.update_yaxes(
+            rangemode="tozero",
+            showgrid=True,
+            gridcolor="#E8EDF2",
+            zeroline=False
+        )
+
+        fig2.update_xaxes(showgrid=False)
+
+        st.plotly_chart(fig2, use_container_width=True)
+
+    # GRAPH 3: Earthquake frequency over time
+
+    region_data["time"] = pd.to_datetime(
+        region_data["time"], utc=True
+    )
+
+    daily_counts = (
+        region_data["time"]
+        .dt.date
+        .value_counts()
+        .sort_index()
+    )
+
+    fig3 = px.line(
+        x=daily_counts.index,
+        y=daily_counts.values,
+        labels={
+            "x": "Date",
+            "y": "Number of earthquakes"
+        },
+        title=f"Earthquake Frequency Over Time — {region}",
+        markers=True
+    )
+
+    fig3.update_layout(
+        **chart_layout,
+        title=dict(
+            text=f"Earthquake Frequency Over Time — {region}",
+            x=0.02
+        )
+    )
+
+    fig3.update_traces(
+        line=dict(color=chart_colour, width=2.5),
+        marker=dict(size=5, color=chart_colour),
+        hovertemplate=(
+            "Date: %{x|%d %b %Y}<br>"
+            "Earthquakes: %{y}"
+            "<extra></extra>"
+        )
+    )
+
+    fig3.update_yaxes(
+        rangemode="tozero",
+        showgrid=True,
+        gridcolor="#E8EDF2",
+        zeroline=False
+    )
+
+    fig3.update_xaxes(
+        showgrid=False,
+        tickformat="%d %b",
+        nticks=8
+    )
+
+    st.plotly_chart(fig3, use_container_width=True)
+
 else:
-    st.write("**There are no earthquakes that match these conditions**")
-
+    st.write("**There are no earthquakes that match these conditions.**")
 st.subheader("Raw Data")
 with st.expander("View earthquake data"):
     st.dataframe(
@@ -299,9 +420,4 @@ with st.expander("View earthquake data"):
 
 st.caption("All data displayed was taken from the USGS 2026 earthquake feed (Last updated 2026)")
 
-st.write("Streamlit version:", st.__version__)
-st.write("PyDeck version:", pdk.__version__)
-
 # ADD COMMENTS!!
-
-st.write("HALLO")
