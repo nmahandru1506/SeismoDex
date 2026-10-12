@@ -320,7 +320,7 @@ if not region_data.empty:
         fig.update_yaxes(
             rangemode="tozero",
             showgrid=True,
-            gridcolor="#E8EDF2",
+            gridcolor=grid_colourr,
             zeroline=False
         )
 
@@ -362,7 +362,7 @@ if not region_data.empty:
         fig2.update_yaxes(
             rangemode="tozero",
             showgrid=True,
-            gridcolor="#E8EDF2",
+            gridcolor=grid_colour,
             zeroline=False
         )
 
