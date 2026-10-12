@@ -178,15 +178,7 @@ map = pdk.Deck(
     map_style="light")
 # hov# hover feature for earthquake info
 
-st.markdown("""
-<style>
-div[data-testid="stDeckGlJsonChart"] {
-    overflow: visible !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-st.pydeck_chart(map, height=600)
+st.pydeck_map
 
 st.subheader(f"Earthquake Statistics - {region}")
 if not region_data.empty:
