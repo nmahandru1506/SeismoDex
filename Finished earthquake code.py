@@ -178,7 +178,7 @@ map = pdk.Deck(
     map_style="light")
 # hov# hover feature for earthquake info
 
-st.pydeck_map
+st.pydeck_chart(map)
 
 st.subheader(f"Earthquake Statistics - {region}")
 if not region_data.empty:
