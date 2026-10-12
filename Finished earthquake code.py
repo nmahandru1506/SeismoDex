@@ -8,7 +8,7 @@ st.set_page_config(layout="wide")
 
 
 st.title("SeismoDex")
-st.subheader("Explore global seismic activity through real-time earthquake data")
+st.subheader("Explore global seismic activity through real-time 2026 earthquake data")
 st.divider()
 
 url = ("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.csv")
@@ -276,5 +276,8 @@ with st.expander("View earthquake data"):
         .sort_values("mag", ascending=False))
 
 st.caption("All data displayed was taken from the USGS 2026 earthquake feed (Last updated 2026)")
+
+print("Streamlit version:", st.__version__)
+print("PyDeck version:", pdk.__version__)
 
 # ADD COMMENTS!!
