@@ -247,7 +247,7 @@ if not region_data.empty:
         chart_template = "plotly_white"
         background_colour = "#FFFFFF"
         text_colour = "#263445"
-        gridcolor=grid_colour
+        grid_colour = "#E8EDF2"
         chart_colour = "#168C9B"
 
     # Shared styling for all three charts
@@ -320,7 +320,7 @@ if not region_data.empty:
         fig.update_yaxes(
             rangemode="tozero",
             showgrid=True,
-            gridcolor=grid_colourr,
+            gridcolor="#E8EDF2",
             zeroline=False
         )
 
@@ -362,7 +362,7 @@ if not region_data.empty:
         fig2.update_yaxes(
             rangemode="tozero",
             showgrid=True,
-            gridcolor=grid_colour,
+            gridcolor="#E8EDF2",
             zeroline=False
         )
 
