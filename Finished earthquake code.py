@@ -173,7 +173,7 @@ region_data["formatted_time"] = (
 map = pdk.Deck(
     layers=layer,
     initial_view_state=view_state,
-    tooltip={"html": "Place: {place}<br>Magnitude: {mag}<br>Depth: {depth} km, Time: {formatted_time}"},
+    tooltip={"html": "Place: {place}<br>Magnitude: {mag}<br>Depth: {depth} km, Time: {formatted_time}<br>"},
     map_style="light")
 # hov# hover feature for earthquake info
 
