@@ -247,7 +247,7 @@ if not region_data.empty:
         chart_template = "plotly_white"
         background_colour = "#FFFFFF"
         text_colour = "#263445"
-        grid_colour = "#E8EDF2"
+        gridcolor=grid_colour
         chart_colour = "#168C9B"
 
     # Shared styling for all three charts
