@@ -4,6 +4,7 @@ import streamlit as st
 import pydeck as pdk
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime as dt
 st.set_page_config(layout="wide")
 
 
@@ -12,6 +13,7 @@ st.subheader("Explore global seismic activity through real-time earthquake data"
 st.divider()
 
 url = ("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.csv")
+# using the USGS earthquake dataset
 world = gpd.read_file("https://naturalearth.s3.amazonaws.com/110m_cultural/ne_110m_admin_0_countries.zip")
 
 earthquakes = pd.read_csv(url)
@@ -156,10 +158,15 @@ layer = pdk.Layer(
     get_fill_color="mag<4 ? [((mag - 2.5) / 1.5) * 255, 255, 0, 255]: mag<5.5 ? [255, 255 - (((mag - 4.0) / 1.5) * 115), 0, 255]: [255, 140 - (((mag - 5.5) / 2.5) * 140), 0, 255]",
     pickable=True)
 
+timestamp = pd.to_datetime(region_data["time"])
+datetime = dt.fromisoformat(timestamp.replace("Z", "+00:00"))
+formatted = dt.strftime("%d %B %Y, %H:%M:%S")
+
+
 map = pdk.Deck(
     layers=layer,
     initial_view_state=view_state,
-    tooltip={"html": "Place: {place}<br>Magnitude: {mag}<br>Depth: {depth}"},
+    tooltip={"html": "Place: {place}<br>Magnitude: {mag}<br>Depth: {depth}, Time: {formatted}<br>Time"},
     map_style="light")
 # hover feature for earthquake info
 
@@ -260,6 +267,6 @@ with st.expander("View earthquake data"):
         region_data[["place", "mag", "depth"]]
         .sort_values("mag", ascending=False))
 
-st.caption("All data displayed was taken from the USGS earthquake feed (Last updated 2026)")
+st.caption("All data displayed was taken from the USGS 2026 earthquake feed (Last updated 2026)")
 
 # ADD COMMENTS!!
