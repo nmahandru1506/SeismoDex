@@ -105,6 +105,7 @@ region_data, centre_lat, centre_lon, zoom = get_region(region, min_magnitude, ma
 
 
 st.subheader("**Seismic Activity Map**")
+st. caption("Hover over earthquakes for more information")
 
 legend_column, country_column = st.columns([65, 35])
 
@@ -160,7 +161,7 @@ map = pdk.Deck(
     initial_view_state=view_state,
     tooltip={"html": "Place: {place}<br>Magnitude: {mag}<br>Depth: {depth}"},
     map_style="light")
-
+# hover feature for earthquake info
 
 st.pydeck_chart(map)
 
@@ -201,7 +202,7 @@ if not region_data.empty:
         magnitude_counts = region_data["magnitude_category"].value_counts().sort_index()
         fig, ax = plt.subplots()
         x = np.arange(4)
-        
+
         theme = st.get_option("theme.base")
 
         if theme == "dark":
@@ -214,7 +215,7 @@ if not region_data.empty:
             plot_color = "#F5F5F5"
             text_color = "#222222"
             bar_color = "#0077B6"
-        
+
         fig.patch.set_facecolor(bg_color)
         ax.set_facecolor(plot_color)
         ax.bar(x, magnitude_counts.values, color=bar_color)
