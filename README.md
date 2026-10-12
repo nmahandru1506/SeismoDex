@@ -5,6 +5,7 @@ SeismoDex is a Python project I built to explore earthquake data and look at how
 The website uses earthquake data from the USGS to display recent seismic activity on an interactive map, alongside statistics and graphs that help explore the data.
 
 **What it does**
+
 Displays earthquake locations on an interactive world map, with information about each earthquake available on hover
 Lets users explore different regions, from individual continents to the whole world
 Filters earthquakes by minimum magnitude and maximum depth
