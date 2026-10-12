@@ -277,7 +277,7 @@ with st.expander("View earthquake data"):
 
 st.caption("All data displayed was taken from the USGS 2026 earthquake feed (Last updated 2026)")
 
-print("Streamlit version:", st.__version__)
-print("PyDeck version:", pdk.__version__)
+st.write("Streamlit version:", st.__version__)
+st.write("PyDeck version:", pdk.__version__)
 
 # ADD COMMENTS!!
