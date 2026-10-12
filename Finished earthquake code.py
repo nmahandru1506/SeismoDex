@@ -4,7 +4,6 @@ import streamlit as st
 import pydeck as pdk
 import matplotlib.pyplot as plt
 import numpy as np
-import datetime as dt
 st.set_page_config(layout="wide")
 
 
@@ -13,9 +12,9 @@ st.subheader("Explore global seismic activity through real-time earthquake data"
 st.divider()
 
 url = ("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.csv")
-# using the USGS earthquake dataset
+# using the USGS earthquake 2026 dataset
 world = gpd.read_file("https://naturalearth.s3.amazonaws.com/110m_cultural/ne_110m_admin_0_countries.zip")
-
+# using GeoPandas to explore a Natural Earth database to visualise the different regions
 earthquakes = pd.read_csv(url)
 
 regions = {"Asia": {"min_lat": -10, "max_lat": 90, "min_lon": 25, "max_lon": 180},
@@ -26,6 +25,7 @@ regions = {"Asia": {"min_lat": -10, "max_lat": 90, "min_lon": 25, "max_lon": 180
            "Antarctica": {"min_lat": -90, "max_lat": -60, "min_lon": -180, "max_lon": 180},
            "Oceania": {"min_lat": -50, "max_lat": 10, "min_lon": 110, "max_lon": 180},
            "World": {"min_lat": -180, "max_lat": 180, "min_lon": -180, "max_lon": 180}}
+# define the boundaries of the different areas mapped
 
 if "region" not in st.session_state:
     st.session_state["region"] = "Asia"
@@ -39,6 +39,7 @@ st.session_state["region"] = st.pills(
     default=st.session_state["region"],
     label_visibility="collapsed",
 )
+# creating buttons for the user to interact with to change the map data
 
 # col5, col6, col7, col8 = st.columns([1, 1, 1.5, 1.5])
 # with col5:
@@ -97,6 +98,8 @@ def get_region(region, min_magnitude, max_depth):
                                   (earthquakes["mag"] >= min_magnitude) &
                                   (earthquakes["depth"] <= max_depth)]
     return region_data, centre_lat, centre_lon, zoom
+
+# a function used to define zoom magnitudes and sort region data to isolate the region centre, magnitude and depth
 
 
 min_magnitude = st.slider("Minimum Magnitude", min_value=2.5, max_value=8.0, value=4.0, step=0.1)
@@ -158,17 +161,21 @@ layer = pdk.Layer(
     get_fill_color="mag<4 ? [((mag - 2.5) / 1.5) * 255, 255, 0, 255]: mag<5.5 ? [255, 255 - (((mag - 4.0) / 1.5) * 115), 0, 255]: [255, 140 - (((mag - 5.5) / 2.5) * 140), 0, 255]",
     pickable=True)
 
-timestamp = pd.to_datetime(region_data["time"])
-datetime = dt.fromisoformat(timestamp.replace("Z", "+00:00"))
-formatted = dt.strftime("%d %B %Y, %H:%M:%S")
+region_data["time"] = pd.to_datetime(
+    region_data["time"], utc=True
+)
+
+region_data["formatted_time"] = (
+    region_data["time"].dt.strftime("%d %B %Y, %H:%M:%S")
+)
 
 
 map = pdk.Deck(
     layers=layer,
     initial_view_state=view_state,
-    tooltip={"html": "Place: {place}<br>Magnitude: {mag}<br>Depth: {depth}, Time: {formatted}<br>Time"},
+    tooltip={"html": "Place: {place}<br>Magnitude: {mag}<br>Depth: {depth} km, Time: {formatted_time}"},
     map_style="light")
-# hover feature for earthquake info
+# hov# hover feature for earthquake info
 
 st.pydeck_chart(map)
 
