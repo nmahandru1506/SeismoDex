@@ -165,7 +165,7 @@ region_data["time"] = pd.to_datetime(
     region_data["time"], utc=True
 )
 
-region_data["formatted_time"] = (
+formatted_time = (
     region_data["time"].dt.strftime("%d %B %Y, %H:%M:%S")
 )
 
