@@ -200,7 +200,7 @@ div[data-testid="stDeckGlJsonChart"] {
 </style>
 """, unsafe_allow_html=True)
 
-st.pydeck_chart(map, height=600)
+st.pydeck_chart(map, width="stretch", height=600)
 
 st.subheader(f"Earthquake Statistics - {region}")
 if not region_data.empty:
