@@ -4,3 +4,4 @@ geopandas
 pydeck
 matplotlib
 numpy
+plotly
