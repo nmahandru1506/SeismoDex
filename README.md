@@ -39,4 +39,11 @@ streamlit run app.py
 
 Streamlit will provide a local URL where you can open the website in your browser.
 
+## Screenshots
 
+### Interactive earthquake map
+![SeismoDex earthquake map](Earthquake-map.png)
+
+### Earthquake analysis
+![SeismoDex analysis graphs](graph1.png)
+![SeismoDex analysis graphs](graph2.png)
