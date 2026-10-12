@@ -110,12 +110,12 @@ region_data, centre_lat, centre_lon, zoom = get_region(region, min_magnitude, ma
 
 
 st.subheader("**Seismic Activity Map**")
-st. caption("Hover over earthquakes for more information")
 
 legend_column, country_column = st.columns([65, 35])
 
 with legend_column:
     st.write("Magnitude: 🟢 2.5–4.0    🟡 4.0–5.5     🟠 5.5–6.5     🔴 6.5+")
+    st. caption("Hover over earthquakes for more information")
 with country_column:
     if region != "World":
         country = world[world["CONTINENT"] == region]
@@ -174,8 +174,22 @@ layer = pdk.Layer(
 map = pdk.Deck(
     layers=layer,
     initial_view_state=view_state,
-    tooltip={"html": "Place: {place}<br>Magnitude: {mag}<br>Depth: {depth} km<br>Time: {formatted_time}"},
-    map_style="light")
+    tooltip={
+        "html": """
+            <b>Place:</b> {place}<br/>
+            <b>Magnitude:</b> {mag}<br/>
+            <b>Depth:</b> {depth} km<br/>
+            <b>Time:</b> {formatted_time}
+        """,
+        "style": {
+            "backgroundColor": "#27313D",
+            "color": "white",
+            "fontSize": "14px",
+            "padding": "10px"
+        }
+    },
+    map_style="light"
+)
 # hov# hover feature for earthquake info
 
 st.pydeck_chart(map)
