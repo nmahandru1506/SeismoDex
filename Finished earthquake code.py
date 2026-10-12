@@ -165,7 +165,7 @@ region_data["time"] = pd.to_datetime(
     region_data["time"], utc=True
 )
 
-formatted_time = (
+region_data["formatted_time"] = (
     region_data["time"].dt.strftime("%d %B %Y, %H:%M:%S")
 )
 
@@ -173,7 +173,7 @@ formatted_time = (
 map = pdk.Deck(
     layers=layer,
     initial_view_state=view_state,
-    tooltip={"html": "Place: {place}<br>Magnitude: {mag}<br>Depth: {depth} km<br>Time: {formatted_time}<br>"},
+    tooltip={"html": "Place: {place}<br>Magnitude: {mag}<br>Depth: {depth} km<br>Time: {formatted_time}"},
     map_style="light")
 # hov# hover feature for earthquake info
 
