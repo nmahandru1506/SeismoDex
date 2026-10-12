@@ -153,14 +153,6 @@ view_state = pdk.ViewState(
     zoom=zoom)
 
 
-layer = pdk.Layer(
-    "ScatterplotLayer",
-    data=region_data,
-    get_position="[longitude, latitude]",
-    get_radius="mag * mag * 3000",
-    get_fill_color="mag<4 ? [((mag - 2.5) / 1.5) * 255, 255, 0, 255]: mag<5.5 ? [255, 255 - (((mag - 4.0) / 1.5) * 115), 0, 255]: [255, 140 - (((mag - 5.5) / 2.5) * 140), 0, 255]",
-    pickable=True)
-
 region_data["time"] = pd.to_datetime(
     region_data["time"], utc=True
 )
@@ -169,6 +161,15 @@ region_data["formatted_time"] = (
     region_data["time"].dt.strftime("%d %B %Y, %H:%M:%S")
 )
 # time conversion for hover feature
+
+layer = pdk.Layer(
+    "ScatterplotLayer",
+    data=region_data,
+    get_position="[longitude, latitude]",
+    get_radius="mag * mag * 3000",
+    get_fill_color="mag<4 ? [((mag - 2.5) / 1.5) * 255, 255, 0, 255]: mag<5.5 ? [255, 255 - (((mag - 4.0) / 1.5) * 115), 0, 255]: [255, 140 - (((mag - 5.5) / 2.5) * 140), 0, 255]",
+    pickable=True)
+
 
 map = pdk.Deck(
     layers=layer,
