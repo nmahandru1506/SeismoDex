@@ -168,7 +168,7 @@ region_data["time"] = pd.to_datetime(
 region_data["formatted_time"] = (
     region_data["time"].dt.strftime("%d %B %Y, %H:%M:%S")
 )
-
+# time conversion for hover feature
 
 map = pdk.Deck(
     layers=layer,
@@ -179,7 +179,7 @@ map = pdk.Deck(
 
 st.pydeck_chart(map)
 
-
+st.subheader(f"Earthquake Statistics - {region}")
 if not region_data.empty:
     num_earthquakes = len(region_data)
     strong_earthquake = region_data["mag"].max()
