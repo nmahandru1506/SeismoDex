@@ -233,24 +233,41 @@ if not region_data.empty:
     st.subheader("Earthquake Analysis")
 
     # Consistent styling for all three graphs
-    chart_template = "plotly_white"
 
+    # Detect the current Streamlit theme
+    theme = st.get_option("theme.base") or "light"
+
+    if theme == "dark":
+        chart_template = "plotly_dark"
+        background_colour = "#0E1621"
+        text_colour = "#E6EDF3"
+        grid_colour = "#293849"
+        chart_colour = "#35C6BE"
+    else:
+        chart_template = "plotly_white"
+        background_colour = "#FFFFFF"
+        text_colour = "#263445"
+        grid_colour = "#E8EDF2"
+        chart_colour = "#168C9B"
+
+    # Shared styling for all three charts
     chart_font = {
         "family": "Arial",
         "size": 13,
-        "color": "#263445"
+        "color": text_colour
     }
 
     chart_layout = {
         "template": chart_template,
         "font": chart_font,
-        "paper_bgcolor": "#FFFFFF",
-        "plot_bgcolor": "#FFFFFF",
-        "margin": dict(l=15, r=15, t=65, b=20),
-        "height": 380
+        "paper_bgcolor": background_colour,
+        "plot_bgcolor": background_colour,
+        "margin": dict(l=20, r=20, t=65, b=25),
+        "height": 380,
+        "hoverlabel": {
+            "font": {"color": text_colour}
+        }
     }
-
-    chart_colour = "#168C9B"
 
     # GRAPH 1: Earthquake magnitude distribution
 
